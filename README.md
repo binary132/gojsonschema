@@ -157,5 +157,3 @@ https://github.com/sigu-399/gojsonreference
 gojsonschema uses the following test suite :
 
 https://github.com/json-schema/JSON-Schema-Test-Suite
-
-Licensed under [The MIT License (MIT)](http://opensource.org/licenses/MIT).
