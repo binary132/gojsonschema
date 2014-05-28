@@ -677,8 +677,6 @@ func (d *JsonSchemaDocument) parseReference(documentNode interface{}, currentSch
 			return err
 		}
 
-		// println("jsp: " + jsonPointer.String())
-		// error here
 		refdDocumentNode, _, err = jsonPointer.Get(dsp.Document)
 		if err != nil {
 			return err
