@@ -150,8 +150,8 @@ http://json-schema.org/latest/json-schema-validation.html
 ## Dependencies
 
 ```
-go get -u gopkg.in/binary132/gojsonpointer.v1
-go get -u gopkg.in/binary132/gojsonschema.v1
+go get -u github.com/binary132/gojsonpointer
+go get -u github.com/binary132/gojsonschema
 ```
 
 ## Uses

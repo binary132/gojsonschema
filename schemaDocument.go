@@ -32,7 +32,7 @@ import (
 	"reflect"
 	"regexp"
 
-	"gopkg.in/binary132/gojsonreference.v1"
+	"github.com/binary132/gojsonreference"
 )
 
 func NewJsonSchemaDocument(document interface{}) (*JsonSchemaDocument, error) {
