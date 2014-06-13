@@ -148,9 +148,11 @@ http://json-schema.org/latest/json-schema-core.html
 http://json-schema.org/latest/json-schema-validation.html
 
 ## Dependencies
-https://github.com/sigu-399/gojsonpointer
 
-https://github.com/sigu-399/gojsonreference
+```
+go get -u gopkg.in/binary132/gojsonpointer.v1
+go get -u gopkg.in/binary132/gojsonschema.v1
+```
 
 ## Uses
 
