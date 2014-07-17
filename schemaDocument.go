@@ -32,7 +32,7 @@ import (
 	"reflect"
 	"regexp"
 
-	"github.com/sigu-399/gojsonreference"
+	"github.com/binary132/gojsonreference"
 )
 
 func NewJsonSchemaDocument(document interface{}) (*JsonSchemaDocument, error) {
@@ -153,7 +153,6 @@ func (d *JsonSchemaDocument) parseSchema(documentNode interface{}, currentSchema
 			currentSchema.refSchema = sch
 
 		} else {
-
 			var err error
 			err = d.parseReference(documentNode, currentSchema, k)
 			if err != nil {
@@ -654,7 +653,7 @@ func (d *JsonSchemaDocument) parseReference(documentNode interface{}, currentSch
 
 	standaloneDocument := d.pool.GetStandaloneDocument()
 
-	if jsonReference.HasFullUrl || standaloneDocument != nil {
+	if jsonReference.GetUrl().IsAbs() || standaloneDocument != nil {
 		currentSchema.ref = &jsonReference
 	} else {
 		inheritedReference, err := currentSchema.ref.Inherits(jsonReference)
@@ -688,7 +687,6 @@ func (d *JsonSchemaDocument) parseReference(documentNode interface{}, currentSch
 		if err != nil {
 			return err
 		}
-
 	}
 
 	if !isKind(refdDocumentNode, reflect.Map) {

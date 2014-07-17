@@ -31,7 +31,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sigu-399/gojsonreference"
+	"github.com/binary132/gojsonreference"
 )
 
 type schemaPoolDocument struct {
@@ -67,7 +67,7 @@ func (p *schemaPool) GetDocument(reference gojsonreference.JsonReference) (*sche
 	var err error
 
 	// It is not possible to load anything that is not canonical...
-	if !reference.IsCanonical() {
+	if !reference.GetUrl().IsAbs() {
 		return nil, errors.New(fmt.Sprintf("Reference must be canonical %s", reference))
 	}
 
@@ -92,7 +92,7 @@ func (p *schemaPool) GetDocument(reference gojsonreference.JsonReference) (*sche
 
 	var document interface{}
 
-	if reference.HasFileScheme {
+	if reference.GetUrl().Scheme == "file" {
 
 		internalLog(" Loading new document from file")
 
@@ -103,7 +103,7 @@ func (p *schemaPool) GetDocument(reference gojsonreference.JsonReference) (*sche
 			return nil, err
 		}
 
-	} else {
+	} else if reference.GetUrl().Scheme == "http" {
 
 		internalLog(" Loading new document from http")
 
@@ -112,7 +112,8 @@ func (p *schemaPool) GetDocument(reference gojsonreference.JsonReference) (*sche
 		if err != nil {
 			return nil, err
 		}
-
+	} else {
+		return nil, errors.New("unhandled scheme " + reference.GetUrl().Scheme)
 	}
 
 	spd = &schemaPoolDocument{Document: document}
