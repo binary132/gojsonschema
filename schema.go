@@ -31,7 +31,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/binary132/gojsonreference"
+	"github.com/juju/gojsonreference"
 )
 
 type jsonSchema struct {
