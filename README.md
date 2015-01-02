@@ -6,7 +6,7 @@
 
 An implementation of JSON Schema, based on IETF's draft v4 - Go language
 
-References:
+References :
 
 * http://json-schema.org
 * http://json-schema.org/latest/json-schema-core.html
@@ -18,9 +18,14 @@ References:
 go get github.com/xeipuuv/gojsonschema
 ```
 
+Dependencies :
+* https://github.com/xeipuuv/gojsonpointer
+* https://github.com/xeipuuv/gojsonreference
+* https://github.com/stretchr/testify/assert
+
 ## Usage 
 
-### A full working example
+### Example
 
 ```go
 
@@ -49,18 +54,12 @@ func main() {
     }
 
     if result.Valid() {
-    
         fmt.Printf("The document is valid\n")
-    
     } else {
-    
         fmt.Printf("The document is not valid. see errors :\n")
-    
-        // display validation errors
         for _, desc := range result.Errors() {
             fmt.Printf("- %s\n", desc)
         }
-    
     }
 
 }
@@ -70,35 +69,31 @@ func main() {
 
 #### Loading a schema
 
-Schemas can be loaded remotely from a HTTP URL :
+* Using HTTP :
 
 ```go
-    schema, err := gjs.NewSchema("http://myhost/schema.json")
+    schema, err := gjs.NewSchema("http://www.some_host.com/schema.json")
 ```
 
-From a local file, using the file URI scheme:
+* Using a local file :
 
 ```go
-	schema, err := gjs.NewSchema("file:///home/me/schema.json")
+    schema, err := gjs.NewSchema("file:///home/some_user/schema.json")
 ```
 
+Note the URI scheme is used here (file://), also the full path to the file is required.
 
-You may also load the schema from within your code, using a map[string]interface{} variable or a JSON string.
-
-Note that schemas loaded from non-HTTP are subject to limitations, they need to be standalone schemas; 
-That means references to local files and/or remote files within these schemas will not work.
+* Using a Go map[string]interface{} :
 
 ```go
-	m := map[string]interface{}{
-		"type": "string"}
-
-	schema, err := gjs.NewSchema(m)
+    m := map[string]interface{}{"type": "string"}
+    schema, err := gjs.NewSchema(m)
 ```
 
-Or
+* Using a JSON string :
 
 ```go
-	schema, err := gjs.NewSchema(`{"type": "string"}`)
+    schema, err := gjs.NewSchema(`{"type": "string"}`)
 ```
 
 #### Loading a JSON
@@ -163,12 +158,6 @@ If not valid, you can loop through the error messages returned by the validation
 	}
 ```
 
-## Dependencies
-https://github.com/juju/gojsonpointer
-
-https://github.com/juju/gojsonreference
-
-https://github.com/stretchr/testify/assert
 
 ## Uses
 
