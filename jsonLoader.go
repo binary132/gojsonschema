@@ -30,7 +30,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/xeipuuv/gojsonreference"
+	"github.com/juju/gojsonreference"
 	"io/ioutil"
 	"net/http"
 	"strings"

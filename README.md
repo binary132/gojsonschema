@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/xeipuuv/gojsonschema.svg)](https://travis-ci.org/xeipuuv/gojsonschema)
+[![Build Status](https://travis-ci.org/juju/gojsonschema.svg)](https://travis-ci.org/juju/gojsonschema)
 
 # gojsonschema
 
@@ -15,12 +15,12 @@ References :
 ## Installation
 
 ```
-go get github.com/xeipuuv/gojsonschema
+go get github.com/juju/gojsonschema
 ```
 
 Dependencies :
-* https://github.com/xeipuuv/gojsonpointer
-* https://github.com/xeipuuv/gojsonreference
+* https://github.com/juju/gojsonpointer
+* https://github.com/juju/gojsonreference
 * https://github.com/stretchr/testify/assert
 
 ## Usage 
@@ -33,13 +33,13 @@ package main
 
 import (
     "fmt"
-    "github.com/xeipuuv/gojsonschema"
+    "github.com/juju/gojsonschema"
 )
 
 func main() {
 
-	schemaLoader := gojsonschema.NewReferenceLoader("file:///home/me/schema.json")
-	documentLoader := gojsonschema.NewReferenceLoader("file:///home/me/document.json")
+    schemaLoader := gojsonschema.NewReferenceLoader("file:///home/me/schema.json")
+    documentLoader := gojsonschema.NewReferenceLoader("file:///home/me/document.json")
 
     result, err := gojsonschema.Validate(schemaLoader, documentLoader)
     if err != nil {
