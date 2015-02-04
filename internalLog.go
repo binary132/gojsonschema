@@ -19,42 +19,23 @@
 // repository-name  gojsonschema
 // repository-desc  An implementation of JSON Schema, based on IETF's draft v4 - Go language.
 //
-// description      Pool of referenced schemas.
+// description      Very simple log wrapper.
+//					Used for debugging/testing purposes.
 //
-// created          25-06-2013
+// created          01-01-2015
 
 package gojsonschema
 
 import (
-	"fmt"
+	"log"
 )
 
-type schemaReferencePool struct {
-	documents map[string]*subSchema
-}
+const internalLogEnabled = false
 
-func newSchemaReferencePool() *schemaReferencePool {
+func internalLog(format string, v ...interface{}) {
 
-	p := &schemaReferencePool{}
-	p.documents = make(map[string]*subSchema)
-
-	return p
-}
-
-func (p *schemaReferencePool) Get(ref string) (r *subSchema, o bool) {
-
-	internalLog(fmt.Sprintf("Schema Reference ( %s )", ref))
-
-	if sch, ok := p.documents[ref]; ok {
-		internalLog(fmt.Sprintf(" From pool"))
-		return sch, true
+	if internalLogEnabled {
+		log.Printf(format, v...)
 	}
 
-	return nil, false
-}
-
-func (p *schemaReferencePool) Add(ref string, sch *subSchema) {
-
-	internalLog(fmt.Sprintf("Add Schema Reference %s to pool", ref))
-	p.documents[ref] = sch
 }
