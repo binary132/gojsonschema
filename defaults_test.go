@@ -11,8 +11,8 @@ import (
 	"fmt"
 	"testing"
 
+	gjs "github.com/juju/gojsonschema"
 	"github.com/stretchr/testify/assert"
-	gjs "github.com/xeipuuv/gojsonschema"
 )
 
 // Get a *Schema given a properties map.
