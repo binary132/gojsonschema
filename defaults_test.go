@@ -7,6 +7,7 @@
 package gojsonschema_test
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -26,6 +27,25 @@ func schemaFromProperties(t *testing.T, properties map[string]interface{}) *gjs.
 	return schema
 }
 
+func testGetDocProperties(schema *gjs.Schema) (doc map[string]interface{}, testError error) {
+	// Capture expected panics
+	defer func() {
+		if r := recover(); r != nil {
+			var msg string
+			// This should never panic
+			switch typed := r.(type) {
+			case error:
+				msg = fmt.Sprintf("panic: %s", typed.Error())
+			default:
+				msg = fmt.Sprintf("unexpected panic: %#v", typed)
+			}
+			testError = errors.New(msg)
+		}
+	}()
+	schemaDoc := schema.GetDocProperties()
+	return schemaDoc, nil
+}
+
 func TestGetDocProperties(t *testing.T) {
 	for i, test := range []struct {
 		should         string
@@ -33,29 +53,31 @@ func TestGetDocProperties(t *testing.T) {
 		expectedErr    string
 		expectedResult interface{}
 	}{{
-		should:      "fail for nil pool",
-		expectedErr: "document pool for schema not set",
+		should:      "panic for nil pool",
+		expectedErr: "runtime error: invalid memory address or nil pointer dereference",
 	}, {
-		should:      "fail for non-map document",
+		should:      "panic for non-map document",
 		usingSchema: "not-a-map",
-		expectedErr: "schema document is not a map[string]interface{}",
+		expectedErr: "interface conversion: interface is string, not map[string]interface {}",
 	}, {
-		should:      "fail for non schema document",
+		should:      "panic for non schema document",
 		usingSchema: map[string]interface{}{"foo": "bar"},
-		expectedErr: "schema document has no properties",
+		expectedErr: "interface conversion: interface is nil, not map[string]interface {}",
 	}, {
 		should: "work for an OK document",
-		usingSchema: map[string]interface{}{"properties": map[string]interface{}{
-			"foo": "bar"}},
+		usingSchema: map[string]interface{}{
+			"properties": map[string]interface{}{
+				"foo": "bar"}},
 		expectedResult: map[string]interface{}{"foo": "bar"},
 	}} {
 		fmt.Printf("TestGetDocProperties test (%d) | should %s\n", i, test.should)
 		schema := gjs.MakeTestingSchema(test.usingSchema)
-		doc, err := schema.GetDocProperties()
+		doc, err := testGetDocProperties(schema)
 		if test.expectedErr != "" {
-			assert.EqualError(t, err, test.expectedErr)
+			assert.EqualError(t, err, "panic: "+test.expectedErr)
 			continue
 		}
+		assert.NoError(t, err)
 		assert.Equal(t, test.expectedResult, doc)
 	}
 
@@ -216,19 +238,69 @@ func TestDefaultObjects(t *testing.T) {
 	for i, test := range []struct {
 		should          string
 		usingProperties map[string]interface{}
-		usingParams     map[string]interface{}
+		into            map[string]interface{}
 		expectedResult  map[string]interface{}
 		expectedError   string
-	}{} {
+	}{{
+		should:          "have no problem with empty properties",
+		usingProperties: map[string]interface{}{},
+	}, {
+		should:          "handle panics from bad schemas gracefully",
+		usingProperties: map[string]interface{}{"foo": "bar"},
+		expectedError:   "interface conversion: interface is string, not map[string]interface {}",
+	}, {
+		should: "work for simple schemas",
+		usingProperties: map[string]interface{}{
+			"foo": map[string]interface{}{"default": 5},
+		},
+		into: map[string]interface{}{"bar": 4},
+		expectedResult: map[string]interface{}{
+			"bar": 4,
+			"foo": 5,
+		},
+	}, {
+		should: "not overwrite values",
+		usingProperties: map[string]interface{}{
+			"foo": map[string]interface{}{"default": 5},
+		},
+		into:           map[string]interface{}{"foo": 4},
+		expectedResult: map[string]interface{}{"foo": 4},
+	}, {
+		should: "work for more complex schemas",
+		usingProperties: map[string]interface{}{
+			"num": map[string]interface{}{
+				"properties": map[string]interface{}{
+					"dum": map[string]interface{}{
+						"type":        "string",
+						"description": "dum",
+					},
+					"foo": map[string]interface{}{
+						"default": map[string]interface{}{
+							"bar": "baz",
+						}}}},
+			"foo": map[string]interface{}{
+				"properties": map[string]interface{}{
+					"bar": map[string]interface{}{
+						"baz": map[string]interface{}{
+							"woz": map[string]interface{}{
+								"type": "integer",
+							}}}}}},
+		into: map[string]interface{}{},
+		expectedResult: map[string]interface{}{
+			"num": map[string]interface{}{
+				"foo": map[string]interface{}{"bar": "baz"},
+			}},
+	}} {
 		fmt.Printf("TestDefaultObjects test (%d) | should %s\n", i, test.should)
-		schema := schemaFromProperties(t, test.usingProperties)
-		err := schema.InsertDefaults(map[string]interface{}(test.usingParams))
+		schemaDoc := map[string]interface{}{"properties": test.usingProperties}
+		schema := gjs.MakeTestingSchema(schemaDoc)
+		err := schema.InsertDefaults(test.into)
 		if test.expectedError != "" {
-			assert.EqualError(t, err, test.expectedError)
+			assert.EqualError(t, err, "schema error caused a panic: "+test.expectedError)
 			continue
 		}
-		assert.Nil(t, err)
-		assert.Equal(t, test.expectedResult, test.usingParams)
+		assert.NoError(t, err)
+		assert.Equal(t, test.expectedResult, test.into)
 	}
 
 	println()

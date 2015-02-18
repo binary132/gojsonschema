@@ -17,7 +17,7 @@ func MakeTestingSchema(doc interface{}) *Schema {
 }
 
 // This just uses the internal definition.
-func (s *Schema) GetDocProperties() (map[string]interface{}, error) {
+func (s *Schema) GetDocProperties() map[string]interface{} {
 	return s.getDocProperties()
 }
 
