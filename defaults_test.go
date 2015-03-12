@@ -168,7 +168,7 @@ func TestIterateAndInsert(t *testing.T) {
 	println()
 }
 
-func TestDefaultObjects(t *testing.T) {
+func TestInsertDefaults(t *testing.T) {
 	tests := []struct {
 		should          string
 		usingProperties map[string]interface{}
@@ -178,10 +178,21 @@ func TestDefaultObjects(t *testing.T) {
 	}{{
 		should:          "have no problem with empty properties",
 		usingProperties: M(),
+		expectedResult:  M(),
 	}, {
 		should:          "handle panics from bad schemas gracefully",
 		usingProperties: M("foo", "bar"),
 		expectedError:   "interface conversion: interface is string, not map[string]interface {}",
+	}, {
+		should:          "return empty map if given nil target",
+		into:            nil,
+		usingProperties: M(),
+		expectedResult:  M(),
+	}, {
+		should:          "make map if given nil target",
+		into:            nil,
+		usingProperties: M("foo", M("default", 5)),
+		expectedResult:  M("foo", 5),
 	}, {
 		should:          "work for simple schemas",
 		usingProperties: M("foo", M("default", 5)),
@@ -210,13 +221,13 @@ func TestDefaultObjects(t *testing.T) {
 		fmt.Printf("TestDefaultObjects test (%d) | should %s\n", i, test.should)
 		schemaDoc := M("properties", test.usingProperties)
 		schema := gjs.MakeTestingSchema(schemaDoc)
-		err := schema.InsertDefaults(test.into)
+		result, err := schema.InsertDefaults(test.into)
 		if test.expectedError != "" {
 			assert.EqualError(t, err, "schema error caused a panic: "+test.expectedError)
 			continue
 		}
 		assert.NoError(t, err)
-		assert.Equal(t, test.expectedResult, test.into)
+		assert.Equal(t, test.expectedResult, result)
 	}
 
 	println()
