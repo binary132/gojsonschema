@@ -13,11 +13,11 @@ import (
 
 // InsertDefaults takes a map[string]interface{} and inserts any missing
 // default values specified in the JSON-Schema document.  If the given "into"
-// map is nil, and default values exist, it will be created.
+// map is nil, it will be created.
 //
 // This is an initial implementation which does not support refs, etc.
-// The target value must be an object and not a bare value.
-func (s *Schema) InsertDefaults(into map[string]interface{}) (returnErr error) {
+// The schema must be for an object, not a bare value.
+func (s *Schema) InsertDefaults(into map[string]interface{}) (m map[string]interface{}, returnErr error) {
 	// Handle any panics caused by malformed schemas.
 	defer schemaPanicHandler(&returnErr)
 
@@ -32,7 +32,7 @@ func (s *Schema) InsertDefaults(into map[string]interface{}) (returnErr error) {
 	// non-destructively.
 	iterateAndInsert(into, properties)
 
-	return nil
+	return into, nil
 }
 
 // schemaPanics catches panics caused by type assertions or gets on schemas
